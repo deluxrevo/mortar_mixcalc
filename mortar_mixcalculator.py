@@ -10,7 +10,7 @@ batch_kg = st.number_input("⚖️ Taille du lot (kg)", min_value=25, value=1000
 # 🧱 Material prices
 st.subheader("🔧 Prix des matériaux (MAD/tonne)")
 cement_price = st.number_input("💠 Ciment (CEM II 42.5)", value=1300)
-hpmc_price = st.number_input("🌿 HPMC", value=4000)
+lime_price = st.number_input("🟩 Chaux aérienne", value=1800)
 sand_price = st.number_input("🪨 Sable concassé", value=120)
 kaolin_price = st.number_input("🧼 Kaolin (Argile blanche)", value=150)
 
@@ -26,23 +26,23 @@ use_plastifier = st.toggle("✅ Ajouter plastifiant Sika (ex: Plastiment-60 M)",
 plastifier_price = st.number_input("💧 Prix plastifiant (MAD/25kg bidon)", value=550)
 plastifier_dosage = st.number_input("🧪 Dosage utilisé (kg/tonne)", value=0.5)
 
-# ⚙️ Recipe ratios (fixed)
-cement_pct = 0.25
-hpmc_pct = 0.015
-sand_pct = 0.73
-kaolin_pct = 0.005  # 5 kg/tonne
+# ⚙️ Recipe ratios based on 1000 kg batch
+cement_pct = 0.25      # 250 kg
+lime_pct = 0.015       # 15 kg
+kaolin_pct = 0.005     # 5 kg
+sand_pct = 0.73        # 730 kg
 
 cement_kg = batch_kg * cement_pct
-hpmc_kg = batch_kg * hpmc_pct
-sand_kg = batch_kg * sand_pct
+lime_kg = batch_kg * lime_pct
 kaolin_kg = batch_kg * kaolin_pct
+sand_kg = batch_kg * sand_pct
 
 # 💰 Cost calculations
 material_cost = (
     (cement_kg / 1000) * cement_price +
-    (hpmc_kg / 1000) * hpmc_price +
-    (sand_kg / 1000) * sand_price +
-    (kaolin_kg / 1000) * kaolin_price
+    (lime_kg / 1000) * lime_price +
+    (kaolin_kg / 1000) * kaolin_price +
+    (sand_kg / 1000) * sand_price
 )
 
 fixed_costs = packaging_cost + labor_cost + transport_cost
