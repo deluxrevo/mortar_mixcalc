@@ -20,11 +20,11 @@ packaging_cost = st.number_input("📦 Emballage (par tonne)", value=150)
 labor_cost = st.number_input("👷 Main d'œuvre (par tonne)", value=100)
 transport_cost = st.number_input("🚚 Transport (par tonne)", value=150)
 
-# 🧪 Plasticizer toggle
-st.subheader("🧪 Additifs Plastifiants (optionnels)")
-use_plastifier = st.toggle("✅ Ajouter plastifiant Sika (ex: Plastiment-60 M)", value=False)
-plastifier_price = st.number_input("💧 Prix plastifiant (MAD/25kg bidon)", value=550)
-plastifier_dosage = st.number_input("🧪 Dosage utilisé (kg/tonne)", value=0.5)
+# 🧪 Additive toggle
+st.subheader("🧪 Additif Hydrofuge (optionnel)")
+use_hydrofuge = st.toggle("✅ Ajouter Sika Poudre Hydrofuge", value=False)
+hydrofuge_price = st.number_input("💧 Prix Sika Poudre Hydrofuge (MAD/tonne)", value=3800)
+hydrofuge_dosage = st.number_input("🧪 Dosage utilisé (kg/tonne)", value=10.0)
 
 # ⚙️ Recipe ratios based on 1000 kg batch
 cement_pct = 0.25      # 250 kg
@@ -36,22 +36,19 @@ cement_kg = batch_kg * cement_pct
 lime_kg = batch_kg * lime_pct
 kaolin_kg = batch_kg * kaolin_pct
 sand_kg = batch_kg * sand_pct
+hydrofuge_kg = batch_kg * (hydrofuge_dosage / 1000) if use_hydrofuge else 0
 
 # 💰 Cost calculations
 material_cost = (
     (cement_kg / 1000) * cement_price +
     (lime_kg / 1000) * lime_price +
     (kaolin_kg / 1000) * kaolin_price +
-    (sand_kg / 1000) * sand_price
+    (sand_kg / 1000) * sand_price +
+    (hydrofuge_kg / 1000) * hydrofuge_price
 )
 
 fixed_costs = packaging_cost + labor_cost + transport_cost
-
-additive_cost = 0
-if use_plastifier:
-    additive_cost = (plastifier_dosage / 25) * plastifier_price
-
-total_cost = material_cost + fixed_costs + additive_cost
+total_cost = material_cost + fixed_costs
 
 # 📊 Output
 st.subheader("📊 Résultat")
