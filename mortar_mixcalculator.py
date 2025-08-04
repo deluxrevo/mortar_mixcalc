@@ -9,10 +9,10 @@ batch_kg = st.number_input("⚖️ Taille du lot (kg)", min_value=25, value=1000
 
 # 🧱 Material prices
 st.subheader("🔧 Prix des matériaux (MAD/tonne)")
-cement_price = st.number_input("💠 Ciment (CEM II 42.5)", value=1300)
-lime_price = st.number_input("🟩 Chaux aérienne", value=1800)
-sand_price = st.number_input("🪨 Sable concassé", value=120)
-kaolin_price = st.number_input("🧼 Kaolin (Argile blanche)", value=150)
+cement_price = st.number_input("💠 Ciment (CEM I 42.5)", value=1300)
+lime_price = st.number_input("🟩 Chaux aérienne CL90", value=1800)
+sand_price = st.number_input("🪨 Sable lavé 0–2 mm", value=120)
+hpmc_price = st.number_input("📌 HPMC ou TYLOSE®", value=3600)
 
 # 📦 Overhead costs
 st.subheader("📦 Coûts fixes")
@@ -24,26 +24,26 @@ transport_cost = st.number_input("🚚 Transport (par tonne)", value=150)
 st.subheader("🧪 Additif Hydrofuge (optionnel)")
 use_hydrofuge = st.toggle("✅ Ajouter Sika Poudre Hydrofuge", value=False)
 hydrofuge_price = st.number_input("💧 Prix Sika Poudre Hydrofuge (MAD/tonne)", value=3800)
-hydrofuge_dosage = st.number_input("🧪 Dosage utilisé (kg/tonne)", value=10.0)
+hydrofuge_dosage = st.number_input("🧪 Dosage utilisé (kg/tonne)", value=1.2)
 
 # ⚙️ Recipe ratios based on 1000 kg batch
-cement_pct = 0.25      # 250 kg
-lime_pct = 0.015       # 15 kg
-kaolin_pct = 0.005     # 5 kg
-sand_pct = 0.73        # 730 kg
+cement_pct = 0.27        # ~270 kg
+lime_pct = 0.04          # ~40 kg
+sand_pct = 0.685         # ~685 kg
+hpmc_pct = 0.0035        # ~3.5 kg
 
 cement_kg = batch_kg * cement_pct
 lime_kg = batch_kg * lime_pct
-kaolin_kg = batch_kg * kaolin_pct
 sand_kg = batch_kg * sand_pct
+hpmc_kg = batch_kg * hpmc_pct
 hydrofuge_kg = batch_kg * (hydrofuge_dosage / 1000) if use_hydrofuge else 0
 
 # 💰 Cost calculations
 material_cost = (
     (cement_kg / 1000) * cement_price +
     (lime_kg / 1000) * lime_price +
-    (kaolin_kg / 1000) * kaolin_price +
     (sand_kg / 1000) * sand_price +
+    (hpmc_kg / 1000) * hpmc_price +
     (hydrofuge_kg / 1000) * hydrofuge_price
 )
 
