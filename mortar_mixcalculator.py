@@ -8,26 +8,27 @@ st.caption("Par Omar 🇲🇦 — Prix en MAD/t, quantités en kg")
 
 # 2. Taille du lot cible
 batch_target_kg = st.number_input(
-    "⚖️ Taille du lot cible (kg)", 
+    "⚖️ Taille du lot cible (kg)",
     min_value=0.0, value=1000.0, step=25.0
 )
 
 # 3. Prix par ingrédient (MAD/tonne)
 st.subheader("🔧 Prix des matériaux")
-material_names = ["Ciment", "Chaux", "Sable", "HPMC"]
+material_names  = ["Ciment", "Chaux", "Sable", "HPMC"]
 material_labels = [
     "💠 Ciment (CEM I 42.5)",
     "🟩 Chaux aérienne CL90",
     "🪨 Sable lavé 0–2 mm",
     "📌 HPMC ou TYLOSE®"
 ]
-default_prices = [1300.0, 1800.0, 120.0, 3600.0]
+default_prices  = [1300.0, 1800.0, 120.0, 3600.0]
 
 prices = {
     name: st.number_input(label, value=price)
     for name, label, price in zip(material_names, material_labels, default_prices)
 }
 
+# Option hydrophuge
 add_hydro = st.checkbox("✅ Ajouter Sika Poudre Hydrofuge")
 if add_hydro:
     prices["Hydrofuge"] = st.number_input(
@@ -51,9 +52,9 @@ if add_hydro:
 st.subheader("⚖️ Quantités par ingrédient")
 quantities = {}
 for name, pct in ratios.items():
-    default_qty = batch_target_kg * pct
+    default_qty     = batch_target_kg * pct
     quantities[name] = st.number_input(
-        f"{name} (kg)", 
+        f"{name} (kg)",
         min_value=0.0, value=round(default_qty, 2), step=1.0
     )
 
@@ -65,24 +66,32 @@ rows = []
 for name, qty in quantities.items():
     cost = qty / 1000 * prices[name]
     rows.append({
-        "Ingrédient":     name,
-        "Quantité (kg)":  round(qty, 2),
-        "Prix (MAD/t)":   round(prices[name], 2),
-        "Coût (MAD)":     round(cost, 2)
+        "Ingrédient":    name,
+        "Quantité (kg)": round(qty, 2),
+        "Prix (MAD/t)":  round(prices[name], 2),
+        "Coût (MAD)":    round(cost, 2)
     })
-df_material = pd.DataFrame(rows)
+df_material   = pd.DataFrame(rows)
 material_cost = df_material["Coût (MAD)"].sum()
 
-# 8. Coûts fixes (MAD/tonne → MAD pour le lot)
+# 8. Coûts fixes
 st.subheader("📦 Coûts fixes")
-overhead_labels = ["Emballage", "Main d'œuvre", "Transport"]
+overhead_labels   = ["Emballage", "Main d'œuvre", "Transport"]
 overhead_defaults = [150.0, 100.0, 150.0]
 overheads = {
     label: st.number_input(f"📦 {label} (MAD/tonne)", value=val)
     for label, val in zip(overhead_labels, overhead_defaults)
 }
-fixed_per_ton = sum(overheads.values())
-fixed_total   = fixed_per_ton * (batch_actual_kg / 1000)
+
+# Nouvelle entrée : coût fixe par lot (hors variable)
+batch_fixed_cost = st.number_input(
+    "🛠️ Coût fixe par lot (MAD, ex: mise en route)", value=0.0, step=100.0
+)
+
+# Calculs
+fixed_per_ton        = sum(overheads.values())
+fixed_variable_total = fixed_per_ton * (batch_actual_kg / 1000)
+fixed_total          = fixed_variable_total + batch_fixed_cost
 
 # 9. Résultats finaux
 total_cost  = material_cost + fixed_total
@@ -93,6 +102,8 @@ st.subheader("📊 Détail des coûts matière")
 st.table(df_material)
 
 st.write(f"Coût fixe par tonne : **{fixed_per_ton:.2f} MAD**")
+st.write(f"Coûts fixes variables total : **{fixed_variable_total:.2f} MAD**")
+st.write(f"Coût fixe additionnel par lot : **{batch_fixed_cost:.2f} MAD**")
 st.write(f"Coût fixe total pour {batch_actual_kg:.2f} kg : **{fixed_total:.2f} MAD**")
 
 st.subheader("💰 Résultat global")
